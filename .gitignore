@@ -1,0 +1,30 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
+
+# SQLite
+backend/*.db
+
+# Environment Variables
+backend/.env
+
+# Alembic cache
+backend/alembic/__pycache__/
+
+# Node
+
+frontend/node_modules/
+
+# Vite
+frontend/dist/
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
