@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from app.exceptions.auth import (ForbiddenError, InvalidCredentialsError, UnauthorizedError,)
 from app.exceptions.base import AppException
-from app.exceptions.user import (EmailAlreadyExistsError, RoleNotFoundError, UserNotFoundError,)
+from app.exceptions.user import (EmailAlreadyExistsError, EmployeeAlreadyExistsError, EmployeeNotFoundError, RoleNotFoundError, UserNotFoundError,)
 
 def register_exception_handlers(app: FastAPI):
 
@@ -34,3 +34,11 @@ def register_exception_handlers(app: FastAPI):
     @app.exception_handler(UserNotFoundError)
     async def user_not_found_handler(request: Request, exc: UserNotFoundError,):
         return JSONResponse(status_code=404, content={"success": False, "message": exc.message,},)
+
+    @app.exception_handler(EmployeeAlreadyExistsError)
+    async def employee_already_exists_handler(request: Request, exc: EmployeeAlreadyExistsError,):
+        return JSONResponse(status_code=409, content={"success": False, "message": str(exc),},)
+
+    @app.exception_handler(EmployeeNotFoundError)
+    async def employee_not_found_handler(request: Request, exc: EmployeeNotFoundError,):
+        return JSONResponse(status_code=404, content={"success": False, "message": str(exc),},)

@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models import User
 from app.repositories.user_repository import UserRepository
+from app.constants.roles import RoleEnum
 
 security = HTTPBearer()
 
@@ -25,14 +26,22 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
     return user
 
-def get_current_admin(
-    current_user: User = Depends(get_current_user),
-) -> User:
+def get_current_admin(current_user: User = Depends(get_current_user),) -> User:
 
-    if current_user.role.name != "Admin":
+    if current_user.role.name != RoleEnum.ADMIN.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required",
+        )
+
+    return current_user
+
+def get_current_sub_admin(current_user: User = Depends(get_current_user),) -> User:
+
+    if current_user.role.name != RoleEnum.SUB_ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sub Admin privileges required",
         )
 
     return current_user

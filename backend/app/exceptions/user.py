@@ -11,3 +11,11 @@ class RoleNotFoundError(AppException):
 class UserNotFoundError(AppException):
     def __init__(self):
         super().__init__("User not found.")
+
+class EmployeeAlreadyExistsError(Exception):
+    def __init__(self):
+        super().__init__("Employee already exists.")
+
+class EmployeeNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Employee not found.")

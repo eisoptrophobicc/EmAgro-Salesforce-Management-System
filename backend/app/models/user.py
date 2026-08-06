@@ -13,6 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    employees = relationship("Employee", back_populates="sub_admin",)
     role = relationship("Role", back_populates="users")
 
     is_active = Column(Boolean, default=True)
