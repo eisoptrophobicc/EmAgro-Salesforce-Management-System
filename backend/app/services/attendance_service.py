@@ -4,8 +4,7 @@ from app.models import Attendance, User
 from app.repositories.attendance_repository import AttendanceRepository
 from app.schemas.attendance import BulkAttendanceRequest
 from app.repositories.employee_repository import EmployeeRepository
-from app.exceptions.handlers import EmployeeNotFoundError
-from app.exceptions.user import AttendanceAlreadyMarkedError
+from app.exceptions.user import EmployeeNotFoundError, AttendanceAlreadyMarkedError
 
 class AttendanceService:
 

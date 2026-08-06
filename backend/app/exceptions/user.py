@@ -23,3 +23,23 @@ class EmployeeNotFoundError(Exception):
 class AttendanceAlreadyMarkedError(Exception):
     def __init__(self):
         super().__init__("Attendance already marked.")
+
+class AttendanceNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Attendance not found.")
+
+class TaskAlreadyExistsError(Exception):
+    def __init__(self):
+        super().__init__("Task already exists.")
+
+class TaskNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Task not found.")
+
+class DailyActivityAlreadyExistsError(Exception):
+    def __init__(self):
+        super().__init__("Daily activity already exists.")
+
+class DailyActivityNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Daily activity not found.")

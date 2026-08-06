@@ -17,3 +17,7 @@ class AttendanceRepository:
     @staticmethod
     def attendance_exists(db: Session, employee_id: int, attendance_date,):
         return (db.query(Attendance).filter(Attendance.employee_id == employee_id, Attendance.date == attendance_date,).first() is not None)
+
+    @staticmethod
+    def get_by_id(db: Session, attendance_id: int,):
+        return (db.query(Attendance).filter(Attendance.id == attendance_id).first())

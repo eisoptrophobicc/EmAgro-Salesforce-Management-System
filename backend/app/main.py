@@ -8,6 +8,8 @@ from app.api.roles import router as roles_router
 from app.api.dashboard import router as dashboard_router
 from app.api.employees import router as employees_router
 from app.api.attendance import router as attendance_router
+from app.api.tasks import router as tasks_router
+from app.api.daily_activities import router as daily_activities_router
 
 import app.models
 
@@ -25,6 +27,8 @@ app.include_router(roles_router)
 app.include_router(dashboard_router)
 app.include_router(employees_router)
 app.include_router(attendance_router)
+app.include_router(tasks_router)
+app.include_router(daily_activities_router)
 
 @app.get("/")
 def root():

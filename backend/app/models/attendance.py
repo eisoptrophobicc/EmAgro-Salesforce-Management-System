@@ -19,3 +19,4 @@ class Attendance(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(),)
     employee = relationship("Employee", back_populates="attendance",)
     sub_admin = relationship("User",)
+    daily_activity = relationship("DailyActivity", back_populates="attendance", uselist=False,)

@@ -20,3 +20,4 @@ class Task(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(),)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(),)
     sub_admin = relationship("User", back_populates="tasks",)
+    activity_items = relationship("DailyActivityItem", back_populates="task")

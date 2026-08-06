@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.models import User, Employee
 from app.repositories.employee_repository import EmployeeRepository
 from app.schemas.employee import (CreateEmployeeRequest, UpdateEmployeeRequest,)
-from app.exceptions.handlers import EmployeeAlreadyExistsError
+from app.exceptions.user import EmployeeAlreadyExistsError
 
 class EmployeeService:
 
