@@ -1,12 +1,14 @@
 from sqlalchemy.orm import Session
+import math
 
 from app.core.security import hash_password
 from app.models import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import CreateUserRequest, UpdateUserRequest
+from app.schemas.user import CreateUserRequest, ResetPasswordRequest, UpdateUserRequest, UserListResponse
 from app.repositories.role_repository import RoleRepository
-
+from app.core.security import hash_password
 from app.exceptions.user import (EmailAlreadyExistsError, RoleNotFoundError, UserNotFoundError,)
+from app.mappers.user_mapper import UserMapper
 
 class UserService:
 
@@ -32,8 +34,16 @@ class UserService:
         return UserRepository.create(db, user)
 
     @staticmethod
-    def get_all_users(db: Session):
-        return UserRepository.get_all(db)
+    def get_all_users(db: Session, page: int, page_size: int, search: str | None = None, role_id: int | None = None, active: bool | None = None, sort_by: str = "id", order: str = "asc",):
+        users, total = UserRepository.get_all(db, page, page_size, search, role_id, active, sort_by, order,)
+
+        return UserListResponse(
+            items=UserMapper.to_response_list(users),
+            total=total,
+            page=page,
+            page_size=page_size,
+            pages=math.ceil(total / page_size) if total else 1,
+        )
 
     @staticmethod
     def get_user_by_id(db: Session, user_id: int,):
@@ -75,5 +85,16 @@ class UserService:
             raise UserNotFoundError()
 
         user.is_active = is_active
+
+        return UserRepository.update(db, user)
+
+    @staticmethod
+    def reset_password(db: Session, user_id: int, request: ResetPasswordRequest):
+        user = UserRepository.get_by_id(db, user_id)
+
+        if user is None:
+            raise UserNotFoundError()
+
+        user.hashed_password = hash_password(request.password)
 
         return UserRepository.update(db, user)
