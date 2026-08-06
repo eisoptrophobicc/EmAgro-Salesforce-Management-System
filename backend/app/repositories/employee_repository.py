@@ -32,3 +32,7 @@ class EmployeeRepository:
         db.commit()
         db.refresh(employee)
         return employee
+
+    @staticmethod
+    def belongs_to_sub_admin(db: Session, employee_id: int, sub_admin_id: int,):
+        return (db.query(Employee).filter(Employee.id == employee_id, Employee.sub_admin_id == sub_admin_id,).first())

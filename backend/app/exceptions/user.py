@@ -19,3 +19,7 @@ class EmployeeAlreadyExistsError(Exception):
 class EmployeeNotFoundError(Exception):
     def __init__(self):
         super().__init__("Employee not found.")
+
+class AttendanceAlreadyMarkedError(Exception):
+    def __init__(self):
+        super().__init__("Attendance already marked.")

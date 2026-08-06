@@ -7,10 +7,7 @@ from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post(
-    "/login",
-    response_model=TokenResponse
-)
+@router.post("/login", response_model=TokenResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     token = AuthService.login(db, request.email, request.password)
 

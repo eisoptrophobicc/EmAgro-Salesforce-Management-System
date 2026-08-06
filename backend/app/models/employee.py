@@ -18,5 +18,6 @@ class Employee(Base):
     is_active = Column(Boolean, default=True,)
     sub_admin_id = Column(Integer, ForeignKey("users.id"), nullable=False,)
     sub_admin = relationship("User", back_populates="employees",)
+    attendance = relationship("Attendance", back_populates="employee",)
     created_at = Column(DateTime(timezone=True), server_default=func.now(),)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(),)

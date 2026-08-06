@@ -15,6 +15,7 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     employees = relationship("Employee", back_populates="sub_admin",)
     role = relationship("Role", back_populates="users")
+    tasks = relationship("Task", back_populates="sub_admin",)
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
