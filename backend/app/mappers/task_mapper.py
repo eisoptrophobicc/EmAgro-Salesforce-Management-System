@@ -1,6 +1,7 @@
 from app.models import Task
 from app.schemas.task import TaskResponse
 
+
 class TaskMapper:
 
     @staticmethod
@@ -9,7 +10,4 @@ class TaskMapper:
 
     @staticmethod
     def to_response_list(tasks: list[Task]) -> list[TaskResponse]:
-        return [
-            TaskMapper.to_response(task)
-            for task in tasks
-        ]
+        return [TaskMapper.to_response(task) for task in tasks]

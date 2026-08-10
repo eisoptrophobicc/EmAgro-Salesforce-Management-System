@@ -58,6 +58,30 @@ The project is built as a monorepo consisting of a FastAPI backend and a React f
 - Productivity Summary
 - Historical Dashboard (Date Filter)
 
+### Reports & Exports
+- Productivity Reports
+- Attendance Reports
+- Employee Reports
+- Excel Export
+  - Bold titles and table headers
+  - Auto-sized columns
+  - Frozen report headers
+  - Status colors for Present, Absent, Half Day, and Leave
+- PDF Export
+  - Styled tables
+  - Header backgrounds
+  - Status colors for Present, Absent, Half Day, and Leave
+
+### Error Handling
+- Meaningful API errors for missing users, employees, attendance records, tasks, roles, and daily activities
+- Conflict responses for duplicate resources
+  - Duplicate email
+  - Duplicate employee
+  - Duplicate task
+  - Attendance already marked
+  - Daily activity already submitted
+- Foreign-key validation before create operations where user input references another resource
+
 ### Database
 - Alembic Migrations
 - SQLAlchemy ORM
@@ -78,6 +102,8 @@ The project is built as a monorepo consisting of a FastAPI backend and a React f
 - Uvicorn
 - JWT
 - Passlib
+- OpenPyXL
+- ReportLab
 
 ### Frontend
 
@@ -249,16 +275,16 @@ Additional documentation is available in the `docs` directory.
 - Admin Dashboard
 - Sub Admin Dashboard
 - Productivity Analytics
+- Reports
+- Excel Export
+- PDF Export
 
 ---
 
 ## Roadmap
 
-- Employee Reports
-- Attendance Reports
 - Weekly & Monthly Analytics
-- Excel Export
-- PDF Export
+- Report Filtering Enhancements
 - Dashboard Charts
 - Search & Pagination
 - Docker Support

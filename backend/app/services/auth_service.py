@@ -1,8 +1,10 @@
-from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
+from sqlalchemy.orm import Session
+
+from app.core.security import create_access_token, verify_password
 from app.repositories.user_repository import UserRepository
-from app.core.security import (verify_password, create_access_token, )
+
 
 class AuthService:
 
@@ -17,6 +19,14 @@ class AuthService:
         if not verify_password(password, user.hashed_password):
             return None
 
-        token = create_access_token({"sub": user.email, "uid": user.id, "role": user.role.name, "type": "access", "iat": datetime.now(timezone.utc),})
+        token = create_access_token(
+            {
+                "sub": user.email,
+                "uid": user.id,
+                "role": user.role.name,
+                "type": "access",
+                "iat": datetime.now(timezone.utc),
+            }
+        )
 
         return {"access_token": token, "token_type": "bearer"}

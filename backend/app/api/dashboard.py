@@ -7,8 +7,18 @@ from app.models import User
 from app.schemas.dashboard import DashboardResponse
 from app.services.dashboard_service import DashboardService
 
-router = APIRouter(prefix="/dashboard", tags=["Dashboard"],)
+router = APIRouter(
+    prefix="/dashboard",
+    tags=["Dashboard"],
+)
 
-@router.get("", response_model=DashboardResponse,)
-def get_dashboard(db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin),):
+
+@router.get(
+    "",
+    response_model=DashboardResponse,
+)
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
     return DashboardService.get_dashboard(db)

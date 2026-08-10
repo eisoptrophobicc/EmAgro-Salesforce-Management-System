@@ -1,18 +1,18 @@
 from fastapi import FastAPI
 
-from app.exceptions.handlers import register_exception_handlers
+import app.models
+from app.api.attendance import router as attendance_router
 from app.api.auth import router as auth_router
-from app.api.me import router as me_router
-from app.api.users import router as users_router
-from app.api.roles import router as roles_router
+from app.api.daily_activities import router as daily_activities_router
 from app.api.dashboard import router as dashboard_router
 from app.api.employees import router as employees_router
-from app.api.attendance import router as attendance_router
-from app.api.tasks import router as tasks_router
-from app.api.daily_activities import router as daily_activities_router
+from app.api.me import router as me_router
+from app.api.reports import router as reports_router
+from app.api.roles import router as roles_router
 from app.api.sub_admin_dashboard import router as sub_admin_dashboard_router
-
-import app.models
+from app.api.tasks import router as tasks_router
+from app.api.users import router as users_router
+from app.exceptions.handlers import register_exception_handlers
 
 app = FastAPI(
     title="Salesforce Prototype API",
@@ -31,6 +31,8 @@ app.include_router(attendance_router)
 app.include_router(tasks_router)
 app.include_router(daily_activities_router)
 app.include_router(sub_admin_dashboard_router)
+app.include_router(reports_router)
+
 
 @app.get("/")
 def root():

@@ -1,6 +1,7 @@
 from app.models import User
 from app.schemas.user import UserResponse
 
+
 class UserMapper:
 
     @staticmethod
@@ -15,7 +16,4 @@ class UserMapper:
 
     @staticmethod
     def to_response_list(users: list[User]) -> list[UserResponse]:
-        return [
-            UserMapper.to_response(user)
-            for user in users
-        ]
+        return [UserMapper.to_response(user) for user in users]

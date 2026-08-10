@@ -1,10 +1,12 @@
 from pydantic import BaseModel, EmailStr
 
+
 class CreateEmployeeRequest(BaseModel):
     full_name: str
     email: EmailStr
     phone: str | None = None
     designation: str
+
 
 class UpdateEmployeeRequest(BaseModel):
     full_name: str
@@ -12,6 +14,7 @@ class UpdateEmployeeRequest(BaseModel):
     phone: str | None = None
     designation: str
     is_active: bool
+
 
 class EmployeeResponse(BaseModel):
     id: int

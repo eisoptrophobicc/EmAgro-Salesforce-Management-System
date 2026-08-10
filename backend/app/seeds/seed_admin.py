@@ -1,22 +1,24 @@
 from sqlalchemy.orm import Session
 
-import app.models
 from app.constants.roles import RoleEnum
 from app.core.database import SessionLocal
 from app.core.security import hash_password
 from app.models import Role, User
 
+
 def seed_admin():
     db: Session = SessionLocal()
 
     try:
-        admin_role = (db.query(Role).filter(Role.name == RoleEnum.ADMIN.value).first())
+        admin_role = db.query(Role).filter(Role.name == RoleEnum.ADMIN.value).first()
 
         if not admin_role:
             print("Admin role not found.")
             return
 
-        existing_admin = (db.query(User).filter(User.email == "admin@emamiagrotech.com").first())
+        existing_admin = (
+            db.query(User).filter(User.email == "admin@emamiagrotech.com").first()
+        )
 
         if existing_admin:
             print("Admin user already exists.")
@@ -37,6 +39,7 @@ def seed_admin():
 
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     seed_admin()

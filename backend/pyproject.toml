@@ -1,0 +1,14 @@
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+extend-ignore = [
+    "B008",
+    "DTZ011",
+]
