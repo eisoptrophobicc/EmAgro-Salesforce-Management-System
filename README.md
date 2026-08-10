@@ -19,25 +19,24 @@ The project is built as a monorepo consisting of a FastAPI backend and a React f
 - User Activation / Deactivation
 
 ### Employee Management
-- Employee CRUD
+- Employee Creation
 - Employee Code Generation
-- Employee Status Management
 
 ### Attendance
 - Bulk Attendance Marking
 - Attendance Status
-  - Present
-  - Absent
-  - Half Day
-  - Leave
+  - `Present`
+  - `Absent`
+  - `Half Day`
+  - `Leave`
 - Duplicate Attendance Prevention
 
 ### Task Management
 - Create Tasks
 - Task Types
-  - Integer
-  - Boolean
-  - Text
+  - `Integer`
+  - `Boolean`
+  - `Text`
 - Task Ownership per Sub Admin
 
 ### Daily Activity
@@ -56,7 +55,7 @@ The project is built as a monorepo consisting of a FastAPI backend and a React f
 - Employee Summary
 - Attendance Summary
 - Productivity Summary
-- Historical Dashboard (Date Filter)
+- Historical Dashboard with `target_date` Filter
 
 ### Reports & Exports
 - Productivity Reports
@@ -133,9 +132,12 @@ EmAgro
 │   │   ├── services
 │   │   ├── utils
 │   │   └── main.py
+│   ├── .env.example
 │   ├── alembic
+│   ├── alembic.ini
+│   ├── pyproject.toml
 │   ├── requirements.txt
-│   └── salesforce.db
+│   └── local SQLite database (*.db, generated from DATABASE_URL)
 │
 ├── frontend
 │   ├── public
@@ -206,6 +208,8 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
+cp .env.example .env
+
 alembic upgrade head
 
 uvicorn app.main:app --reload
@@ -217,7 +221,7 @@ Backend runs on
 http://127.0.0.1:8000
 ```
 
-Swagger Documentation
+Swagger documentation
 
 ```
 http://127.0.0.1:8000/docs
@@ -225,11 +229,7 @@ http://127.0.0.1:8000/docs
 
 ### Configure Environment Variables
 
-Create a `.env` file inside the `backend` directory using the provided example:
-
-```bash
-cp .env.example .env
-```
+Create a `.env` file inside the `backend` directory using the provided example. The default example uses `sqlite:///./emagro.db`.
 
 Then update the values as needed before starting the server.
 
@@ -257,10 +257,10 @@ http://localhost:5173
 
 Additional documentation is available in the `docs` directory.
 
-- API Documentation
-- Database Design
-- RBAC Design
-- Setup Guide
+- [API.md](docs/API.md) - API documentation
+- [DATABASE.md](docs/DATABASE.md) - Database design
+- [RBAC.md](docs/RBAC.md) - Role-based access control
+- [SETUP.md](docs/SETUP.md) - Setup guide
 
 ---
 

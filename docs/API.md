@@ -22,7 +22,7 @@ Authorization: Bearer <access_token>
 
 Most successful JSON endpoints return either a resource object or a list of resource objects.
 
-Application errors use this shape:
+Application exceptions registered in `app.exceptions.handlers` use this shape:
 
 ```json
 {
@@ -39,6 +39,8 @@ Common status codes:
 - `404` - Requested resource was not found
 - `409` - Duplicate or conflicting resource
 - `422` - Request validation error
+
+FastAPI authentication and validation errors may use FastAPI's default `detail` response shape.
 
 ## Error Handling
 
@@ -70,6 +72,15 @@ Invalid foreign keys from request payloads are checked before insert where they 
 | `POST` | `/auth/login` | Public | Login and receive a JWT token |
 | `GET` | `/me` | Authenticated | Get the current authenticated user |
 
+Login request:
+
+```json
+{
+  "email": "admin@example.com",
+  "password": "Password123"
+}
+```
+
 ## Users
 
 Admin-only user management.
@@ -82,6 +93,18 @@ Admin-only user management.
 | `PATCH` | `/users/{user_id}` | Update a user |
 | `PATCH` | `/users/{user_id}/status` | Activate or deactivate a user |
 | `PATCH` | `/users/{user_id}/reset-password` | Reset a user's password |
+
+User create and update payloads currently require a password that is 8-128 characters and includes at least one uppercase letter, one lowercase letter, and one digit.
+
+Available filters for `GET /users`:
+
+- `page`
+- `page_size`
+- `search`
+- `role_id`
+- `active`
+- `sort_by`
+- `order`
 
 Relevant errors:
 
@@ -117,11 +140,18 @@ Request body:
   "attendance": [
     {
       "employee_id": 1,
-      "status": "PRESENT"
+      "status": "Present"
     }
   ]
 }
 ```
+
+Accepted attendance status values:
+
+- `Present`
+- `Absent`
+- `Half Day`
+- `Leave`
 
 Relevant errors:
 
@@ -148,6 +178,12 @@ Relevant errors:
 - `409 Task already exists.`
 
 Task names must be unique per Sub Admin.
+
+Accepted task input type values:
+
+- `Boolean`
+- `Integer`
+- `Text`
 
 ## Daily Activities
 
@@ -185,7 +221,15 @@ Only the Sub Admin who marked the attendance can submit the related daily activi
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
 | `GET` | `/dashboard` | Admin | Admin dashboard metrics |
-| `GET` | `/sub-admin-dashboard` | Sub Admin | Sub Admin dashboard metrics |
+| `GET` | `/sub-admin/dashboard` | Sub Admin | Sub Admin dashboard metrics |
+
+`GET /sub-admin/dashboard` accepts an optional `target_date` query parameter in `YYYY-MM-DD` format.
+
+## Roles
+
+| Method | Path | Access | Description |
+| --- | --- | --- | --- |
+| `GET` | `/roles` | Admin | List available roles |
 
 ## Reports
 

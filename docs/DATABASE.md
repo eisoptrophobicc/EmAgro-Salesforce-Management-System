@@ -1,6 +1,6 @@
 # Database Design
 
-EmAgro uses SQLAlchemy ORM models with Alembic migrations and SQLite as the current database engine.
+EmAgro uses SQLAlchemy ORM models with Alembic migrations and SQLite as the current database engine. The local database file is generated from `DATABASE_URL` in `backend/.env`; the example configuration uses `sqlite:///./emagro.db`.
 
 ## Main Tables
 
@@ -67,10 +67,10 @@ Important fields:
 
 Supported statuses:
 
-- `PRESENT`
-- `ABSENT`
-- `HALF_DAY`
-- `LEAVE`
+- `Present`
+- `Absent`
+- `Half Day`
+- `Leave`
 
 Constraints:
 
@@ -93,9 +93,9 @@ Important fields:
 
 Supported input types:
 
-- `INTEGER`
-- `BOOLEAN`
-- `TEXT`
+- `Boolean`
+- `Integer`
+- `Text`
 
 Constraints:
 
