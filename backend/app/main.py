@@ -10,6 +10,7 @@ from app.api.employees import router as employees_router
 from app.api.attendance import router as attendance_router
 from app.api.tasks import router as tasks_router
 from app.api.daily_activities import router as daily_activities_router
+from app.api.sub_admin_dashboard import router as sub_admin_dashboard_router
 
 import app.models
 
@@ -29,6 +30,7 @@ app.include_router(employees_router)
 app.include_router(attendance_router)
 app.include_router(tasks_router)
 app.include_router(daily_activities_router)
+app.include_router(sub_admin_dashboard_router)
 
 @app.get("/")
 def root():

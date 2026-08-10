@@ -15,9 +15,3 @@ def create_daily_activity(request: CreateDailyActivityRequest, db: Session = Dep
     activity = DailyActivityService.create_daily_activity(db, request, current_sub_admin,)
 
     return DailyActivityMapper.to_response(activity)
-
-@router.post("", response_model=DailyActivityResponse, status_code=status.HTTP_201_CREATED,)
-def create_daily_activity(request: CreateDailyActivityRequest, db: Session = Depends(get_db),current_sub_admin: User = Depends(get_current_sub_admin),):
-    activity = DailyActivityService.create_daily_activity(db, request, current_sub_admin,)
-
-    return DailyActivityMapper.to_response(activity)

@@ -1,6 +1,8 @@
+from datetime import date
 from sqlalchemy.orm import Session
 
-from app.models import Attendance
+from app.models import Attendance, Employee
+from app.constants.attendance import AttendanceStatus
 
 class AttendanceRepository:
 
@@ -21,3 +23,7 @@ class AttendanceRepository:
     @staticmethod
     def get_by_id(db: Session, attendance_id: int,):
         return (db.query(Attendance).filter(Attendance.id == attendance_id).first())
+
+    @staticmethod
+    def count_by_status(db: Session, sub_admin_id: int, status: AttendanceStatus, target_date: date,):
+        return (db.query(Attendance).join(Employee).filter(Employee.sub_admin_id == sub_admin_id, Attendance.date == target_date, Attendance.status == status,).count())
