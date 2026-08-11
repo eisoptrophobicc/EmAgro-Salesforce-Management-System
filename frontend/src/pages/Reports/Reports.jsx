@@ -24,6 +24,12 @@ import {
   getAttendanceReport,
   getProductivityReport,
   getEmployeeReport,
+  downloadAttendanceExcel,
+  downloadAttendancePdf,
+  downloadProductivityExcel,
+  downloadProductivityPdf,
+  downloadEmployeeExcel,
+  downloadEmployeePdf,
 } from "@/api/reports";
 
 import {
@@ -46,7 +52,7 @@ function Reports() {
 
   const fromDate = dateRange.from?.toISOString().split("T")[0];
   const toDate = dateRange.to?.toISOString().split("T")[0];
-
+  
   const {
     data: report,
     isFetching,
@@ -68,6 +74,20 @@ function Reports() {
     },
     enabled: false,
   });
+
+  const downloadFile = (blob, filename) => {
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="space-y-6">
@@ -99,62 +119,64 @@ function Reports() {
               {/* From Date */}
               <Popover>
                 <PopoverTrigger
-                  render={
+                    render={
                     <Button variant="outline">
-                      <CalendarIcon />
-
-                      {dateRange.from
+                        <CalendarIcon />
+                        {dateRange.from
                         ? dateRange.from.toLocaleDateString()
                         : "From date"}
                     </Button>
-                  }
+                    }
                 />
 
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
+                    <Calendar
                     mode="single"
                     selected={dateRange.from}
                     onSelect={(date) =>
-                      setDateRange((current) => ({
+                        setDateRange((current) => ({
                         ...current,
                         from: date,
-                      }))
+                        }))
                     }
-                  />
+                    disabled={{ after: new Date() }}
+                    />
                 </PopoverContent>
-              </Popover>
+                </Popover>
 
-              <span className="text-sm text-muted-foreground">
+                <span className="text-muted-foreground">
                 to
-              </span>
+                </span>
 
-              {/* To Date */}
-              <Popover>
+                <Popover>
                 <PopoverTrigger
-                  render={
+                    render={
                     <Button variant="outline">
-                      <CalendarIcon />
-
-                      {dateRange.to
+                        <CalendarIcon />
+                        {dateRange.to
                         ? dateRange.to.toLocaleDateString()
                         : "To date"}
                     </Button>
-                  }
+                    }
                 />
 
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
+                    <Calendar
                     mode="single"
                     selected={dateRange.to}
                     onSelect={(date) =>
-                      setDateRange((current) => ({
+                        setDateRange((current) => ({
                         ...current,
                         to: date,
-                      }))
+                        }))
                     }
-                  />
+                    disabled={[
+                        { before: dateRange.from },
+                        { after: new Date() },
+                    ]}
+                    />
                 </PopoverContent>
-              </Popover>
+                </Popover>
             </div>
           </div>
 
@@ -211,6 +233,56 @@ function Reports() {
               ? "Generating..."
               : "Generate Report"}
           </Button>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+                variant="outline"
+                disabled={!report}
+                onClick={async () => {
+                let blob;
+                let filename;
+
+                if (reportType === "attendance") {
+                    blob = await downloadAttendanceExcel(fromDate, toDate);
+                    filename = "attendance_report.xlsx";
+                } else if (reportType === "productivity") {
+                    blob = await downloadProductivityExcel(fromDate, toDate);
+                    filename = "productivity_report.xlsx";
+                } else {
+                    blob = await downloadEmployeeExcel(fromDate, toDate);
+                    filename = "employee_report.xlsx";
+                }
+
+                downloadFile(blob, filename);
+                }}
+            >
+                Export Excel
+            </Button>
+
+            <Button
+                variant="outline"
+                disabled={!report}
+                onClick={async () => {
+                let blob;
+                let filename;
+
+                if (reportType === "attendance") {
+                    blob = await downloadAttendancePdf(fromDate, toDate);
+                    filename = "attendance_report.pdf";
+                } else if (reportType === "productivity") {
+                    blob = await downloadProductivityPdf(fromDate, toDate);
+                    filename = "productivity_report.pdf";
+                } else {
+                    blob = await downloadEmployeePdf(fromDate, toDate);
+                    filename = "employee_report.pdf";
+                }
+
+                downloadFile(blob, filename);
+                }}
+            >
+                Export PDF
+            </Button>
+          </div>
 
           {/* Selected Report */}
           <div className="rounded-lg border p-6">

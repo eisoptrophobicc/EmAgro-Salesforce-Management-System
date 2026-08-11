@@ -235,11 +235,14 @@ function Dashboard() {
                     from: date,
                   }))
                 }
+                disabled={{ after: new Date() }}
               />
             </PopoverContent>
           </Popover>
 
-          <span className="text-muted-foreground">to</span>
+          <span className="text-muted-foreground">
+            to
+          </span>
 
           <Popover>
             <PopoverTrigger
@@ -263,6 +266,10 @@ function Dashboard() {
                     to: date,
                   }))
                 }
+                disabled={[
+                  { before: dateRange.from },
+                  { after: new Date() },
+                ]}
               />
             </PopoverContent>
           </Popover>
