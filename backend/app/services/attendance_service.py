@@ -1,11 +1,13 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from datetime import date
 
 from app.exceptions.user import AttendanceAlreadyMarkedError, EmployeeNotFoundError
 from app.models import Attendance, User
 from app.repositories.attendance_repository import AttendanceRepository
 from app.repositories.employee_repository import EmployeeRepository
 from app.schemas.attendance import BulkAttendanceRequest
+from app.constants.attendance import AttendanceStatus
 
 
 class AttendanceService:
@@ -54,6 +56,53 @@ class AttendanceService:
             return AttendanceRepository.create_bulk(
                 db,
                 attendance_records,
+            )
+        except IntegrityError:
+            db.rollback()
+            raise AttendanceAlreadyMarkedError()
+
+    @staticmethod
+    def get_attendance_by_date(
+        db: Session,
+        target_date: date,
+        current_user: User,
+    ):
+        return AttendanceRepository.get_by_date(
+            db,
+            current_user.id,
+            target_date,
+        )
+
+    @staticmethod
+    def update_attendance(
+        db: Session,
+        attendance_id: int,
+        status: AttendanceStatus,
+        current_user: User,
+    ):
+        attendance = AttendanceRepository.get_by_id(
+            db,
+            attendance_id,
+        )
+
+        if attendance is None:
+            raise EmployeeNotFoundError()
+
+        employee = EmployeeRepository.belongs_to_sub_admin(
+            db,
+            attendance.employee_id,
+            current_user.id,
+        )
+
+        if employee is None:
+            raise EmployeeNotFoundError()
+
+        attendance.status = status
+
+        try:
+            return AttendanceRepository.update(
+                db,
+                attendance,
             )
         except IntegrityError:
             db.rollback()

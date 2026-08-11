@@ -61,3 +61,29 @@ class AttendanceRepository:
             )
             .count()
         )
+
+    @staticmethod
+    def update(
+        db: Session,
+        attendance: Attendance,
+    ):
+        db.commit()
+        db.refresh(attendance)
+        return attendance
+
+    @staticmethod
+    def get_by_date(
+        db: Session,
+        sub_admin_id: int,
+        target_date: date,
+    ):
+        return (
+            db.query(Attendance)
+            .join(Employee)
+            .filter(
+                Employee.sub_admin_id == sub_admin_id,
+                Attendance.date == target_date,
+            )
+            .order_by(Attendance.employee_id.asc())
+            .all()
+        )
