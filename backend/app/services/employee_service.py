@@ -1,10 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.exceptions.user import EmployeeAlreadyExistsError
+from app.exceptions.user import EmployeeAlreadyExistsError, EmployeeNotFoundError
 from app.models import Employee, User
 from app.repositories.employee_repository import EmployeeRepository
-from app.schemas.employee import CreateEmployeeRequest
+from app.schemas.employee import CreateEmployeeRequest, UpdateEmployeeRequest
 
 
 class EmployeeService:
@@ -41,3 +41,49 @@ class EmployeeService:
         except IntegrityError:
             db.rollback()
             raise EmployeeAlreadyExistsError()
+
+    @staticmethod
+    def update_employee(
+        db: Session,
+        employee_id: int,
+        request: UpdateEmployeeRequest,
+        current_user: User,
+    ):
+        employee = EmployeeRepository.belongs_to_sub_admin(
+            db,
+            employee_id,
+            current_user.id,
+        )
+
+        if employee is None:
+            raise EmployeeNotFoundError()
+
+        existing_employee = EmployeeRepository.get_by_email(
+            db,
+            request.email,
+        )
+
+        if (
+            existing_employee is not None
+            and existing_employee.id != employee.id
+        ):
+            raise EmployeeAlreadyExistsError()
+
+        employee.full_name = request.full_name
+        employee.email = request.email
+        employee.phone = request.phone
+        employee.designation = request.designation
+        employee.is_active = request.is_active
+
+        try:
+            return EmployeeRepository.update(db, employee)
+        except IntegrityError:
+            db.rollback()
+            raise EmployeeAlreadyExistsError()
+
+    @staticmethod
+    def get_employees(db: Session, current_user: User):
+        return EmployeeRepository.get_all(
+            db,
+            current_user.id,
+        )

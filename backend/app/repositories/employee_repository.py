@@ -25,6 +25,15 @@ class EmployeeRepository:
         return db.query(Employee).filter(Employee.email == email).first()
 
     @staticmethod
+    def get_all(db: Session, sub_admin_id: int):
+        return (
+            db.query(Employee)
+            .filter(Employee.sub_admin_id == sub_admin_id)
+            .order_by(Employee.id.asc())
+            .all()
+        )
+
+    @staticmethod
     def email_exists(db: Session, email: str):
         return db.query(Employee).filter(Employee.email == email).first() is not None
 

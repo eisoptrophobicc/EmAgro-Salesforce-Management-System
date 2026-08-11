@@ -2,10 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "@/pages/Login/Login";
 import Dashboard from "@/pages/Dashboard/Dashboard";
+import Employees from "@/pages/Employees/Employees";
 import Reports from "@/pages/Reports/Reports";
 
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import DashboardLayout from "@/layouts/DashboardLayout";
+
 
 function AppRoutes() {
   return (
@@ -16,6 +18,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/employees" element={<Employees />} />
             <Route path="/reports" element={<Reports />} />
           </Route>
         </Route>
@@ -23,5 +26,6 @@ function AppRoutes() {
     </BrowserRouter>
   );
 }
+
 
 export default AppRoutes;
