@@ -8,7 +8,11 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { Link, useLocation } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 
 import {
   SidebarProvider,
@@ -27,6 +31,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { useAuth } from "@/hooks/useAuth";
+
 
 const navigation = [
   {
@@ -62,24 +67,28 @@ const navigation = [
   },
 ];
 
-function DashboardLayout({ children }) {
+
+function DashboardLayout() {
   const { logout, user } = useAuth();
   const location = useLocation();
 
   const visibleNavigation = navigation.filter((item) => {
     if (!item.roles) {
-        return true;
+      return true;
     }
 
     return item.roles.includes(user?.role);
-    });
+  });
+
 
   return (
     <SidebarProvider>
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>EmAgro</SidebarGroupLabel>
+            <SidebarGroupLabel>
+              EmAgro
+            </SidebarGroupLabel>
 
             <SidebarGroupContent>
               <SidebarMenu>
@@ -99,6 +108,7 @@ function DashboardLayout({ children }) {
           </SidebarGroup>
         </SidebarContent>
 
+
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -111,21 +121,29 @@ function DashboardLayout({ children }) {
         </SidebarFooter>
       </Sidebar>
 
+
       <main className="flex min-h-svh flex-1 flex-col">
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-2 h-4" />
+
+          <Separator
+            orientation="vertical"
+            className="mr-2 h-4"
+          />
+
           <span className="font-medium">
             EmAgro Salesforce Management
           </span>
         </header>
 
+
         <div className="flex-1 p-6">
-          {children}
+          <Outlet />
         </div>
       </main>
     </SidebarProvider>
   );
 }
+
 
 export default DashboardLayout;
