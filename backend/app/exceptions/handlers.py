@@ -19,6 +19,8 @@ from app.exceptions.user import (
     TaskAlreadyExistsError,
     TaskNotFoundError,
     UserNotFoundError,
+    EmployeeTaskAlreadyExistsError,
+    EmployeeTaskNotFoundError,
 )
 
 
@@ -213,6 +215,32 @@ def register_exception_handlers(app: FastAPI):
     ):
         return JSONResponse(
             status_code=404,
+            content={
+                "success": False,
+                "message": str(exc),
+            },
+        )
+
+    @app.exception_handler(EmployeeTaskAlreadyExistsError)
+    async def employee_task_already_exists_handler(
+        request: Request,
+        exc: EmployeeTaskAlreadyExistsError,
+    ):
+        return JSONResponse(
+            status_code=409,
+            content={
+                "success": False,
+                "message": str(exc),
+            },
+        )
+
+    @app.exception_handler(EmployeeTaskNotFoundError)
+    async def employee_task_not_found_handler(
+        request: Request,
+        exc: EmployeeTaskNotFoundError,
+    ):
+        return JSONResponse(
+            status_code=409,
             content={
                 "success": False,
                 "message": str(exc),

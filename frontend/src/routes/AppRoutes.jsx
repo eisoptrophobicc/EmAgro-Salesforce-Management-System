@@ -5,6 +5,9 @@ import Dashboard from "@/pages/Dashboard/Dashboard";
 import Employees from "@/pages/Employees/Employees";
 import Reports from "@/pages/Reports/Reports";
 import Attendance from "@/pages/Attendance/Attendance";
+import DailyActivity from "@/pages/DailyActivity/DailyActivity";
+import Tasks from "@/pages/Tasks/Tasks";
+import EmployeeTasks from "@/pages/EmployeeTasks/EmployeeTasks";
 
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -22,6 +25,9 @@ function AppRoutes() {
             <Route path="/employees" element={<Employees />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/attendance" element={<Attendance />} />
+            <Route path="/daily-activity" element={<DailyActivity />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/employee-tasks" element={<EmployeeTasks />} />
           </Route>
         </Route>
       </Routes>

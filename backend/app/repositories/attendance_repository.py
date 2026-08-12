@@ -1,6 +1,6 @@
 from datetime import date
-
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.constants.attendance import AttendanceStatus
 from app.models import Attendance, Employee
@@ -87,3 +87,35 @@ class AttendanceRepository:
             .order_by(Attendance.employee_id.asc())
             .all()
         )
+
+    @staticmethod
+    def attendance_trend(
+        db: Session,
+        sub_admin_id: int,
+        start_date: date,
+        end_date: date,
+    ):
+        rows = (
+            db.query(
+                Attendance.date,
+                Attendance.status,
+                func.count(Attendance.id).label("total"),
+            )
+            .join(
+                Employee,
+                Employee.id == Attendance.employee_id,
+            )
+            .filter(
+                Employee.sub_admin_id == sub_admin_id,
+                Attendance.date >= start_date,
+                Attendance.date <= end_date,
+            )
+            .group_by(
+                Attendance.date,
+                Attendance.status,
+            )
+            .order_by(Attendance.date.asc())
+            .all()
+        )
+
+        return rows

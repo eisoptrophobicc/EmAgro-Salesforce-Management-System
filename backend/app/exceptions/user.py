@@ -54,3 +54,13 @@ class DailyActivityAlreadyExistsError(Exception):
 class DailyActivityNotFoundError(Exception):
     def __init__(self):
         super().__init__("Daily activity not found.")
+
+
+class EmployeeTaskAlreadyExistsError(Exception):
+    def __init__(self):
+        super().__init__("Task is already assigned to this employee.")
+
+
+class EmployeeTaskNotFoundError(Exception):
+    def __init__(self):
+        super().__init__("Task is not assigned to this employee.")

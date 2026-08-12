@@ -31,3 +31,21 @@ def create_daily_activity(
     )
 
     return DailyActivityMapper.to_response(activity)
+
+
+@router.get(
+    "/{attendance_id}",
+    response_model=DailyActivityResponse,
+)
+def get_daily_activity(
+    attendance_id: int,
+    db: Session = Depends(get_db),
+    current_sub_admin: User = Depends(get_current_sub_admin),
+):
+    activity = DailyActivityService.get_daily_activity(
+        db,
+        attendance_id,
+        current_sub_admin,
+    )
+
+    return DailyActivityMapper.to_response(activity)
