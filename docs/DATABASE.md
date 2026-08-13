@@ -1,6 +1,6 @@
 # Database Design
 
-EmAgro uses SQLAlchemy ORM models with Alembic migrations and SQLite as the current database engine. The local database file is generated from `DATABASE_URL` in `backend/.env`; the example configuration uses `sqlite:///./emagro.db`.
+EmAgro uses SQLAlchemy ORM models with Alembic migrations and SQLite as the current database engine. The local database file is generated from `DATABASE_URL` in `backend/.env`; the example configuration uses `sqlite:///./app.db`.
 
 ## Main Tables
 
@@ -134,12 +134,30 @@ Constraints:
 - `task_id` references `tasks.id`.
 - Each task can appear only once per activity through `uq_activity_task`.
 
+### `employee_tasks`
+
+Stores task assignments for employees.
+
+Important fields:
+
+- `id`
+- `employee_id`
+- `task_id`
+
+Constraints:
+
+- `employee_id` references `employees.id`.
+- `task_id` references `tasks.id`.
+- Each employee/task assignment is unique through `uq_employee_task`.
+
 ## Relationships
 
 - A `Role` has many `User` records.
 - A Sub Admin `User` has many `Employee` records.
 - A Sub Admin `User` has many `Task` records.
 - An `Employee` has many `Attendance` records.
+- An `Employee` has many `EmployeeTask` assignment records.
+- A `Task` has many `EmployeeTask` assignment records.
 - An `Attendance` record has one optional `DailyActivity`.
 - A `DailyActivity` has many `DailyActivityItem` records.
 - A `Task` has many `DailyActivityItem` records.
@@ -157,6 +175,8 @@ Examples:
 - Duplicate daily activity returns `Daily activity already exists.`
 - Duplicate task name returns `Task already exists.`
 - Duplicate email returns `Email already exists.`
+- Duplicate employee-task assignment returns `Task is already assigned to this employee.`
+- Missing employee-task assignment during unassign returns `Task is not assigned to this employee.`
 
 ## Migrations
 

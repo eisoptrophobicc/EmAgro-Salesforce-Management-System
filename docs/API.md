@@ -70,6 +70,8 @@ Invalid foreign keys from request payloads are checked before insert where they 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
 | `POST` | `/auth/login` | Public | Login and receive a JWT token |
+| `GET` | `/auth/setup-status` | Public | Check whether first-admin setup is still required |
+| `POST` | `/auth/setup-admin` | Public with setup key | Create the first admin account |
 | `GET` | `/me` | Authenticated | Get the current authenticated user |
 
 Login request:
@@ -80,6 +82,8 @@ Login request:
   "password": "Password123"
 }
 ```
+
+First-admin setup is available only while no Admin user exists. The setup request includes `email`, `full_name`, `password`, and `setup_key`.
 
 ## Users
 
@@ -119,9 +123,25 @@ Sub Admin employee management.
 | Method | Path | Description |
 | --- | --- | --- |
 | `POST` | `/employees` | Create an employee owned by the current Sub Admin |
+| `GET` | `/employees` | List employees owned by the current Sub Admin |
+| `PUT` | `/employees/{employee_id}` | Update an employee owned by the current Sub Admin |
+
+Create request:
+
+```json
+{
+  "full_name": "Ravi Kumar",
+  "email": "ravi@example.com",
+  "phone": "9876543210",
+  "designation": "Field Executive"
+}
+```
+
+Update requests also include `is_active`.
 
 Relevant errors:
 
+- `404 Employee not found.`
 - `409 Employee already exists.`
 
 ## Attendance
@@ -131,6 +151,8 @@ Sub Admin attendance management.
 | Method | Path | Description |
 | --- | --- | --- |
 | `POST` | `/attendance/bulk` | Mark attendance for multiple employees on one date |
+| `GET` | `/attendance` | List attendance for `target_date` |
+| `PUT` | `/attendance/{attendance_id}` | Update an attendance status |
 
 Request body:
 
@@ -159,6 +181,8 @@ Relevant errors:
 - `409 Attendance already marked.`
 
 Duplicate employee IDs inside the same bulk request are also treated as attendance conflicts.
+
+`PUT /attendance/{attendance_id}` accepts `status` as a query parameter.
 
 ## Tasks
 
@@ -192,6 +216,8 @@ Sub Admin daily activity submission.
 | Method | Path | Description |
 | --- | --- | --- |
 | `POST` | `/daily-activities` | Submit a daily activity for an attendance record |
+| `GET` | `/daily-activities/{attendance_id}` | Get the daily activity for an attendance record |
+| `PATCH` | `/daily-activities/{attendance_id}` | Update the daily activity for an attendance record |
 
 Request body:
 
@@ -215,6 +241,34 @@ Relevant errors:
 - `409 Daily activity already exists.`
 
 Only the Sub Admin who marked the attendance can submit the related daily activity.
+
+Daily activity creation and update validate that each task belongs to the current Sub Admin and is assigned to the selected employee.
+
+## Employee Tasks
+
+Sub Admin employee-task assignment.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/employee-tasks` | Assign a task to an employee |
+| `GET` | `/employee-tasks/employee/{employee_id}` | List tasks assigned to an employee |
+| `DELETE` | `/employee-tasks/employee/{employee_id}/task/{task_id}` | Unassign a task from an employee |
+
+Assign request:
+
+```json
+{
+  "employee_id": 1,
+  "task_id": 1
+}
+```
+
+Relevant errors:
+
+- `404 Employee not found.`
+- `404 Task not found.`
+- `404 Task is not assigned to this employee.`
+- `409 Task is already assigned to this employee.`
 
 ## Dashboards
 

@@ -14,9 +14,11 @@ Admin users can manage platform-level users and view admin dashboard metrics.
 Admin-only areas:
 
 - User creation and management
+- User search, filtering, sorting, and pagination
 - User activation and deactivation
 - Password resets for users
 - Admin dashboard
+- Role listing for account creation and editing
 
 ## Sub Admin Access
 
@@ -24,10 +26,13 @@ Sub Admin users manage their own operational data.
 
 Sub Admin areas:
 
-- Employee creation
+- Employee creation, listing, and editing
 - Bulk attendance marking
+- Attendance lookup by date and status updates
 - Task creation and management
+- Employee-task assignment and unassignment
 - Daily activity submission
+- Daily activity lookup and updates
 - Sub Admin dashboard
 - Reports and exports
 
@@ -38,8 +43,12 @@ Sub Admin resources are scoped by the authenticated Sub Admin user.
 Important ownership behavior:
 
 - A Sub Admin can mark attendance only for employees they own.
+- A Sub Admin can update attendance only for attendance records they marked.
 - A Sub Admin can access only their own tasks.
+- A Sub Admin can assign only their own tasks to employees they own.
+- A Sub Admin can unassign only their own task assignments.
 - A Sub Admin can submit daily activity only for attendance they marked.
+- A Sub Admin can submit or update daily activity values only for tasks assigned to the selected employee.
 - Report data is generated only for the authenticated Sub Admin's employees, attendance, tasks, and daily activities.
 
 ## Report Access
