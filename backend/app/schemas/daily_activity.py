@@ -12,6 +12,11 @@ class CreateDailyActivityRequest(BaseModel):
     items: list[DailyActivityItemRequest]
 
 
+class UpdateDailyActivityRequest(BaseModel):
+    remarks: str | None = None
+    items: list[DailyActivityItemRequest]
+
+
 class DailyActivityItemResponse(BaseModel):
     task_id: int
     value: str

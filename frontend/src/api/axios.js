@@ -14,4 +14,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use((response) => {
+  const refreshedToken =
+    response.headers["x-access-token"];
+
+  if (refreshedToken) {
+    localStorage.setItem(
+      "access_token",
+      refreshedToken
+    );
+  }
+
+  return response;
+});
+
 export default api;

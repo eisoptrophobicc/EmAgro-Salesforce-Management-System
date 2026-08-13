@@ -59,12 +59,26 @@ import {
   FileBarChart,
   FileSpreadsheet,
   FileText,
+  Hash,
   TrendingUp,
+  ToggleLeft,
+  Type,
   UserRoundCheck,
   UserRoundX,
   Users,
   Clock3,
 } from "lucide-react";
+
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 
 const REPORT_TYPES = {
@@ -91,26 +105,45 @@ const REPORT_TYPES = {
 };
 
 
+const getDateString = (date) => {
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+};
+
+
+const getDefaultDateRange = () => {
+  const today = new Date();
+  const from = new Date(today);
+
+  from.setDate(today.getDate() - 7);
+
+  return {
+    from,
+    to: today,
+  };
+};
+
+
 function Reports() {
   const [reportType, setReportType] =
     useState("attendance");
 
   const [dateRange, setDateRange] =
-    useState({
-      from: new Date("2026-08-01"),
-      to: new Date("2026-08-10"),
-    });
+    useState(getDefaultDateRange);
 
 
   const fromDate =
     dateRange.from
-      ?.toISOString()
-      .split("T")[0];
+      ? getDateString(dateRange.from)
+      : null;
 
   const toDate =
     dateRange.to
-      ?.toISOString()
-      .split("T")[0];
+      ? getDateString(dateRange.to)
+      : null;
 
 
   const {
@@ -150,6 +183,15 @@ function Reports() {
 
     enabled: false,
   });
+
+  const numericTasks =
+    report?.numeric_tasks ?? [];
+
+  const booleanTasks =
+    report?.boolean_tasks ?? [];
+
+  const textTasks =
+    report?.text_tasks ?? [];
 
 
   const downloadFile = (
@@ -1006,9 +1048,9 @@ function Reports() {
                       </div>
 
 
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
 
-                        <CalendarCheck className="size-5 text-violet-500" />
+                        <CalendarCheck className="size-5 text-blue-500" />
 
                       </div>
 
@@ -1059,10 +1101,195 @@ function Reports() {
 
                 <div className="mb-3 flex items-center gap-2">
 
+                  <Hash className="size-4 text-primary" />
+
+                  <h3 className="text-sm font-medium">
+                    Numeric Output
+                  </h3>
+
+                </div>
+
+
+                <div className="h-72 rounded-xl border p-4">
+
+                  {numericTasks.length === 0 ? (
+
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      No numeric activity recorded for this period.
+                    </div>
+
+                  ) : (
+
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+
+                      <BarChart data={numericTasks}>
+
+                        <CartesianGrid vertical={false} />
+
+                        <XAxis dataKey="task" />
+
+                        <YAxis allowDecimals={false} />
+
+                        <Tooltip />
+
+                        <Bar
+                          dataKey="total"
+                          name="Total value"
+                          fill="#8b5cf6"
+                          radius={[6, 6, 0, 0]}
+                        />
+
+                      </BarChart>
+
+                    </ResponsiveContainer>
+
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div>
+
+                <div className="mb-3 flex items-center gap-2">
+
+                  <ToggleLeft className="size-4 text-primary" />
+
+                  <h3 className="text-sm font-medium">
+                    Boolean Outcomes
+                  </h3>
+
+                </div>
+
+
+                <div className="h-72 rounded-xl border p-4">
+
+                  {booleanTasks.length === 0 ? (
+
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      No yes/no activity recorded for this period.
+                    </div>
+
+                  ) : (
+
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+
+                      <BarChart data={booleanTasks}>
+
+                        <CartesianGrid vertical={false} />
+
+                        <XAxis dataKey="task" />
+
+                        <YAxis allowDecimals={false} />
+
+                        <Tooltip />
+
+                        <Legend />
+
+                        <Bar
+                          dataKey="yes"
+                          stackId="answers"
+                          name="Yes"
+                          fill="#22c55e"
+                        />
+
+                        <Bar
+                          dataKey="no"
+                          stackId="answers"
+                          name="No"
+                          fill="#ef4444"
+                        />
+
+                        <Bar
+                          dataKey="unknown"
+                          stackId="answers"
+                          name="Other"
+                          fill="#94a3b8"
+                          radius={[6, 6, 0, 0]}
+                        />
+
+                      </BarChart>
+
+                    </ResponsiveContainer>
+
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div>
+
+                <div className="mb-3 flex items-center gap-2">
+
+                  <Type className="size-4 text-primary" />
+
+                  <h3 className="text-sm font-medium">
+                    Text Entries
+                  </h3>
+
+                </div>
+
+
+                <div className="h-72 rounded-xl border p-4">
+
+                  {textTasks.length === 0 ? (
+
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      No text activity recorded for this period.
+                    </div>
+
+                  ) : (
+
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+
+                      <BarChart data={textTasks}>
+
+                        <CartesianGrid vertical={false} />
+
+                        <XAxis dataKey="task" />
+
+                        <YAxis allowDecimals={false} />
+
+                        <Tooltip />
+
+                        <Bar
+                          dataKey="total"
+                          name="Entries"
+                          fill="#f59e0b"
+                          radius={[6, 6, 0, 0]}
+                        />
+
+                      </BarChart>
+
+                    </ResponsiveContainer>
+
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div>
+
+                <div className="mb-3 flex items-center gap-2">
+
                   <Activity className="size-4 text-primary" />
 
                   <h3 className="text-sm font-medium">
-                    Tasks
+                    All Activity
                   </h3>
 
                 </div>
@@ -1390,7 +1617,7 @@ function Reports() {
                               </TableCell>
 
 
-                              <TableCell className="text-right font-medium text-violet-600 dark:text-violet-400">
+                              <TableCell className="text-right font-medium text-blue-600 dark:text-blue-400">
                                 {employee.leave}
                               </TableCell>
 

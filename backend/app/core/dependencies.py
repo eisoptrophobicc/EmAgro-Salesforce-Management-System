@@ -1,10 +1,12 @@
-from fastapi import Depends, HTTPException, status
+from datetime import datetime, timezone
+
+from fastapi import Depends, HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.constants.roles import RoleEnum
 from app.core.database import get_db
-from app.core.security import decode_access_token
+from app.core.security import create_access_token, decode_access_token
 from app.models import User
 from app.repositories.user_repository import UserRepository
 
@@ -12,6 +14,7 @@ security = HTTPBearer()
 
 
 def get_current_user(
+    response: Response,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db),
 ) -> User:
@@ -36,6 +39,24 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is inactive",
+        )
+
+    refreshed_token = create_access_token(
+        {
+            "sub": user.email,
+            "uid": user.id,
+            "role": user.role.name,
+            "type": "access",
+            "iat": datetime.now(timezone.utc),
+        }
+    )
+
+    response.headers["X-Access-Token"] = refreshed_token
 
     return user
 

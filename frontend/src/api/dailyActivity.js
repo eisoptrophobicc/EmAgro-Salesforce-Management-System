@@ -46,3 +46,20 @@ export const createDailyActivity = async (
 
   return response.data;
 };
+
+
+export const updateDailyActivity = async (
+  attendanceId,
+  remarks,
+  items
+) => {
+  const response = await api.patch(
+    `/daily-activities/${attendanceId}`,
+    {
+      remarks: remarks || null,
+      items,
+    }
+  );
+
+  return response.data;
+};

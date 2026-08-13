@@ -6,6 +6,7 @@ from app.repositories.report_repository import ReportRepository
 from app.schemas.report import (
     AttendanceReport,
     AttendanceReportResponse,
+    BooleanProductivityItem,
     EmployeeAttendanceItem,
     EmployeeReportItem,
     EmployeeReportResponse,
@@ -56,6 +57,58 @@ class ReportService:
             for row in productivity_rows
         ]
 
+        numeric_rows = ReportRepository.numeric_productivity_summary(
+            db,
+            current_user.id,
+            from_date,
+            to_date,
+        )
+
+        numeric_tasks = [
+            ProductivityItem(
+                task=row.task,
+                total=row.total or 0,
+            )
+            for row in numeric_rows
+        ]
+
+        boolean_rows = ReportRepository.boolean_productivity_summary(
+            db,
+            current_user.id,
+            from_date,
+            to_date,
+        )
+
+        boolean_tasks = [
+            BooleanProductivityItem(
+                task=row.task,
+                yes=row.yes or 0,
+                no=row.no or 0,
+                unknown=(
+                    row.total
+                    - (row.yes or 0)
+                    - (row.no or 0)
+                ),
+                total=row.total,
+            )
+            for row in boolean_rows
+        ]
+
+        text_rows = ReportRepository.text_productivity_summary(
+            db,
+            current_user.id,
+            from_date,
+            to_date,
+        )
+
+        text_tasks = [
+            ProductivityItem(
+                task=row.task,
+                total=row.total,
+            )
+            for row in text_rows
+        ]
+
         timeline_rows = ReportRepository.productivity_timeline(
             db,
             current_user.id,
@@ -76,6 +129,9 @@ class ReportService:
             to_date=to_date,
             attendance=attendance,
             tasks=tasks,
+            numeric_tasks=numeric_tasks,
+            boolean_tasks=boolean_tasks,
+            text_tasks=text_tasks,
             timeline=timeline,
         )
 

@@ -27,7 +27,7 @@ class CreateUserRequest(PasswordSchema):
     role_id: int
 
 
-class UpdateUserRequest(PasswordSchema):
+class UpdateUserRequest(BaseModel):
     full_name: str
     email: EmailStr
     role_id: int

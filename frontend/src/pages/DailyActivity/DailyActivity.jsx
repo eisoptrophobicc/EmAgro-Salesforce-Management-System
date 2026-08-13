@@ -7,6 +7,7 @@ import {
   getEmployeeTasks,
   getDailyActivity,
   createDailyActivity,
+  updateDailyActivity,
 } from "@/api/dailyActivity";
 
 import {
@@ -265,6 +266,19 @@ function DailyActivity() {
   const activityExists =
     Boolean(existingActivity);
 
+  const recordedValues = (
+    existingActivity?.items ?? []
+  ).reduce((current, item) => {
+    current[item.task_id] = item.value;
+
+    return current;
+  }, {});
+
+  const getTaskValue = (taskId) =>
+    values[taskId] ??
+    recordedValues[taskId] ??
+    "";
+
 
   const handleEmployeeChange = (
     value
@@ -304,13 +318,6 @@ function DailyActivity() {
         return;
       }
 
-      if (activityExists) {
-        setSubmitError(
-          "Daily activity has already been recorded for this attendance."
-        );
-        return;
-      }
-
       if (assignedTasks.length === 0) {
         setSubmitError(
           "No activities are assigned to this employee."
@@ -321,9 +328,13 @@ function DailyActivity() {
       const incomplete =
         assignedTasks.some(
           (task) =>
-            values[task.task_id] ===
-              undefined ||
-            values[task.task_id] === ""
+            (
+              values[task.task_id] ===
+                undefined &&
+              recordedValues[task.task_id] ===
+                undefined
+            ) ||
+            getTaskValue(task.task_id) === ""
         );
 
       if (incomplete) {
@@ -340,16 +351,29 @@ function DailyActivity() {
               task.task_id,
 
             value: String(
-              values[task.task_id]
+              getTaskValue(task.task_id)
             ),
           })
         );
 
-      await createDailyActivity(
-        selectedAttendance.id,
-        remarks,
-        items
-      );
+      const activityRemarks =
+        remarks ||
+        existingActivity?.remarks ||
+        "";
+
+      if (activityExists) {
+        await updateDailyActivity(
+          selectedAttendance.id,
+          activityRemarks,
+          items
+        );
+      } else {
+        await createDailyActivity(
+          selectedAttendance.id,
+          activityRemarks,
+          items
+        );
+      }
 
       await queryClient.invalidateQueries({
         queryKey: [
@@ -358,8 +382,6 @@ function DailyActivity() {
         ],
       });
 
-      setValues({});
-      setRemarks("");
       setSuccess(true);
 
     } catch (error) {
@@ -921,6 +943,8 @@ function DailyActivity() {
                   {selectedEmployee?.full_name}{" "}
                   on{" "}
                   {selectedDate.toLocaleDateString()}.
+                  You can update currently
+                  assigned activities below.
 
                 </AlertDescription>
 
@@ -935,8 +959,7 @@ function DailyActivity() {
 
 
       {selectedAttendance &&
-        !activityLoading &&
-        !activityExists && (
+        !activityLoading && (
 
           <Card>
 
@@ -956,7 +979,9 @@ function DailyActivity() {
 
 
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Enter the values for each assigned activity.
+                    {activityExists
+                      ? "Update values for currently assigned activities."
+                      : "Enter the values for each assigned activity."}
                   </p>
 
                 </div>
@@ -1019,9 +1044,9 @@ function DailyActivity() {
                         config.icon;
 
                       const taskValue =
-                        values[
+                        getTaskValue(
                           task.task_id
-                        ] ?? "";
+                        );
 
 
                       return (
@@ -1228,7 +1253,10 @@ function DailyActivity() {
                           event.target.value
                         )
                       }
-                      placeholder="Optional remarks..."
+                      placeholder={
+                        existingActivity?.remarks ||
+                        "Optional remarks..."
+                      }
                       rows={4}
                     />
 
@@ -1290,7 +1318,9 @@ function DailyActivity() {
 
                       {submitting
                         ? "Saving..."
-                        : "Save Activity"}
+                        : activityExists
+                          ? "Update Activity"
+                          : "Save Activity"}
 
                     </Button>
 

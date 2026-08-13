@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.models import User
+from app.constants.roles import RoleEnum
 
 
 class UserRepository:
@@ -24,6 +25,16 @@ class UserRepository:
     @staticmethod
     def email_exists(db: Session, email: str) -> bool:
         return db.query(User).filter(User.email == email).first() is not None
+
+    @staticmethod
+    def admin_exists(db: Session) -> bool:
+        return (
+            db.query(User)
+            .join(User.role)
+            .filter(User.role.has(name=RoleEnum.ADMIN.value))
+            .first()
+            is not None
+        )
 
     @staticmethod
     def get_all(

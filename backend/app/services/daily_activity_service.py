@@ -37,6 +37,7 @@ from app.repositories.task_repository import (
 
 from app.schemas.daily_activity import (
     CreateDailyActivityRequest,
+    UpdateDailyActivityRequest,
 )
 
 
@@ -134,6 +135,80 @@ class DailyActivityService:
             raise DailyActivityNotFoundError()
 
         return activity
+
+
+    @staticmethod
+    def update_daily_activity(
+        db: Session,
+        attendance_id: int,
+        request: UpdateDailyActivityRequest,
+        current_user: User,
+    ):
+        attendance = AttendanceRepository.get_by_id(
+            db,
+            attendance_id,
+        )
+
+        if attendance is None:
+            raise AttendanceNotFoundError()
+
+        if attendance.marked_by != current_user.id:
+            raise AttendanceNotFoundError()
+
+        activity = (
+            DailyActivityRepository.get_by_attendance_id(
+                db,
+                attendance_id,
+            )
+        )
+
+        if activity is None:
+            raise DailyActivityNotFoundError()
+
+        existing_items = {
+            item.task_id: item
+            for item in activity.items
+        }
+
+        activity.remarks = request.remarks
+
+        for item in request.items:
+
+            task = TaskRepository.get_by_id(
+                db,
+                item.task_id,
+                current_user.id,
+            )
+
+            if task is None:
+                raise TaskNotFoundError()
+
+            if not EmployeeTaskRepository.exists(
+                db,
+                attendance.employee_id,
+                item.task_id,
+            ):
+                raise TaskNotFoundError()
+
+            if item.task_id in existing_items:
+                existing_items[item.task_id].value = item.value
+            else:
+                activity.items.append(
+                    DailyActivityItem(
+                        task_id=item.task_id,
+                        value=item.value,
+                    )
+                )
+
+        try:
+            return DailyActivityRepository.update(
+                db,
+                activity,
+            )
+
+        except IntegrityError:
+            db.rollback()
+            raise DailyActivityAlreadyExistsError()
 
 
     @staticmethod

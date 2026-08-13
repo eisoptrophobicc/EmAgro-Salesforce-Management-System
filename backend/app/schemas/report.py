@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AttendanceReport(BaseModel):
@@ -12,6 +12,14 @@ class AttendanceReport(BaseModel):
 
 class ProductivityItem(BaseModel):
     task: str
+    total: int
+
+
+class BooleanProductivityItem(BaseModel):
+    task: str
+    yes: int
+    no: int
+    unknown: int
     total: int
 
 
@@ -49,6 +57,9 @@ class ProductivityReportResponse(BaseModel):
     to_date: date
     attendance: AttendanceReport
     tasks: list[ProductivityItem]
+    numeric_tasks: list[ProductivityItem] = Field(default_factory=list)
+    boolean_tasks: list[BooleanProductivityItem] = Field(default_factory=list)
+    text_tasks: list[ProductivityItem] = Field(default_factory=list)
     timeline: list[TimelineItem]
 
 

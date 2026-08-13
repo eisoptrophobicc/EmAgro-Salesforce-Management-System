@@ -25,6 +25,15 @@ class DailyActivityRepository:
         db.refresh(activity)
         return activity
 
+    @staticmethod
+    def update(
+        db: Session,
+        activity: DailyActivity,
+    ):
+        db.commit()
+        db.refresh(activity)
+        return activity
+
 
     @staticmethod
     def exists(

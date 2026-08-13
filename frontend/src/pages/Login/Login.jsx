@@ -1,11 +1,16 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
-import { login as loginRequest } from "@/api/auth";
+import {
+  getSetupStatus,
+  login as loginRequest,
+  setupAdmin,
+} from "@/api/auth";
 
 import {
   Card,
@@ -45,6 +50,36 @@ const loginSchema = z.object({
     .min(1, "Password is required."),
 });
 
+const setupSchema = z.object({
+  full_name: z
+    .string()
+    .min(1, "Full name is required."),
+
+  email: z
+    .string()
+    .email("Enter a valid email address."),
+
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters.")
+    .regex(
+      /[A-Z]/,
+      "Password must contain an uppercase letter."
+    )
+    .regex(
+      /[a-z]/,
+      "Password must contain a lowercase letter."
+    )
+    .regex(
+      /\d/,
+      "Password must contain a digit."
+    ),
+
+  setup_key: z
+    .string()
+    .min(1, "Setup key is required."),
+});
+
 
 const FEATURES = [
   {
@@ -69,6 +104,61 @@ const FEATURES = [
   },
 ];
 
+const PASSWORD_REQUIREMENTS = [
+  {
+    label: "At least 8 characters",
+    test: (value) => value.length >= 8,
+  },
+  {
+    label: "One uppercase letter",
+    test: (value) => /[A-Z]/.test(value),
+  },
+  {
+    label: "One lowercase letter",
+    test: (value) => /[a-z]/.test(value),
+  },
+  {
+    label: "One number",
+    test: (value) => /\d/.test(value),
+  },
+];
+
+
+function PasswordRequirements({
+  value = "",
+}) {
+  return (
+    <ul className="grid gap-1 text-xs sm:grid-cols-2">
+      {PASSWORD_REQUIREMENTS.map(
+        (requirement) => {
+          const isMet =
+            requirement.test(value);
+
+          return (
+            <li
+              key={requirement.label}
+              className={
+                isMet
+                  ? "flex items-center gap-1.5 text-green-600 dark:text-green-400"
+                  : "flex items-center gap-1.5 text-muted-foreground"
+              }
+            >
+              <Check
+                className={
+                  isMet
+                    ? "size-3"
+                    : "size-3 opacity-35"
+                }
+              />
+              {requirement.label}
+            </li>
+          );
+        }
+      )}
+    </ul>
+  );
+}
+
 
 function Login() {
   const navigate = useNavigate();
@@ -80,6 +170,24 @@ function Login() {
   const [submitError, setSubmitError] =
     useState("");
 
+  const [passwordValue, setPasswordValue] =
+    useState("");
+
+  const [setupMode, setSetupMode] =
+    useState(false);
+
+  const {
+    data: setupStatus,
+  } = useQuery({
+    queryKey: ["setup-status"],
+    queryFn: getSetupStatus,
+  });
+
+  const setupRequired =
+    Boolean(setupStatus?.setup_required);
+
+  const activeSchema =
+    setupMode ? setupSchema : loginSchema;
 
   const {
     register,
@@ -89,8 +197,11 @@ function Login() {
       isSubmitting,
     },
   } = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(activeSchema),
   });
+
+  const passwordField =
+    register("password");
 
 
   const onSubmit = async (data) => {
@@ -98,10 +209,20 @@ function Login() {
 
     try {
       const response =
-        await loginRequest(
-          data.email,
-          data.password
-        );
+        setupMode
+          ? await setupAdmin({
+              full_name:
+                data.full_name,
+              email: data.email,
+              password:
+                data.password,
+              setup_key:
+                data.setup_key,
+            })
+          : await loginRequest(
+              data.email,
+              data.password
+            );
 
       login(response.access_token);
 
@@ -297,12 +418,15 @@ function Login() {
                   <div>
 
                     <CardTitle className="text-2xl tracking-tight sm:text-3xl">
-                      Welcome back
+                      {setupMode
+                        ? "Create admin"
+                        : "Welcome back"}
                     </CardTitle>
 
                     <CardDescription className="mt-2 leading-5">
-                      Sign in to your EmAgro Salesforce
-                      Management account.
+                      {setupMode
+                        ? "Create the first administrator account for this workspace."
+                        : "Sign in to your EmAgro Salesforce Management account."}
                     </CardDescription>
 
                   </div>
@@ -321,6 +445,15 @@ function Login() {
                   >
 
 
+                    {setupRequired && (
+
+                      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-3.5 text-sm text-blue-700 dark:text-blue-300">
+                        No admin account exists yet. Use the deployment setup key to create the first admin.
+                      </div>
+
+                    )}
+
+
                     {submitError && (
 
                       <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3.5">
@@ -330,6 +463,85 @@ function Login() {
                         <p className="text-sm leading-5 text-destructive">
                           {submitError}
                         </p>
+
+                      </div>
+
+                    )}
+
+
+                    <div className="space-y-2">
+
+                      {setupMode && (
+
+                        <>
+
+                          <Label htmlFor="full_name">
+                            Full Name
+                          </Label>
+
+
+                          <Input
+                            id="full_name"
+                            autoComplete="name"
+                            placeholder="System Administrator"
+                            className="h-10"
+                            {...register(
+                              "full_name"
+                            )}
+                          />
+
+
+                          {errors.full_name && (
+
+                            <p className="text-sm text-destructive">
+                              {
+                                errors
+                                  .full_name
+                                  .message
+                              }
+                            </p>
+
+                          )}
+
+                        </>
+
+                      )}
+
+                    </div>
+
+
+                    {setupMode && (
+
+                      <div className="space-y-2">
+
+                        <Label htmlFor="setup_key">
+                          Setup Key
+                        </Label>
+
+
+                        <Input
+                          id="setup_key"
+                          type="password"
+                          autoComplete="one-time-code"
+                          placeholder="Enter deployment setup key"
+                          className="h-10"
+                          {...register(
+                            "setup_key"
+                          )}
+                        />
+
+
+                        {errors.setup_key && (
+
+                          <p className="text-sm text-destructive">
+                            {
+                              errors
+                                .setup_key
+                                .message
+                            }
+                          </p>
+
+                        )}
 
                       </div>
 
@@ -383,9 +595,15 @@ function Login() {
                           autoComplete="current-password"
                           placeholder="Enter your password"
                           className="h-10 pr-10"
-                          {...register(
-                            "password"
-                          )}
+                          {...passwordField}
+                          onChange={(event) => {
+                            passwordField.onChange(
+                              event
+                            );
+                            setPasswordValue(
+                              event.target.value
+                            );
+                          }}
                         />
 
 
@@ -424,6 +642,15 @@ function Login() {
 
                       )}
 
+
+                      {setupMode && (
+
+                        <PasswordRequirements
+                          value={passwordValue}
+                        />
+
+                      )}
+
                     </div>
 
 
@@ -443,7 +670,9 @@ function Login() {
                         </>
                       ) : (
                         <>
-                          Sign in
+                          {setupMode
+                            ? "Create admin"
+                            : "Sign in"}
 
                           <ArrowRight className="size-4" />
 
@@ -451,6 +680,28 @@ function Login() {
                       )}
 
                     </Button>
+
+
+                    {setupRequired && (
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setSetupMode(
+                            (current) =>
+                              !current
+                          );
+                          setSubmitError("");
+                        }}
+                        className="h-10 w-full"
+                      >
+                        {setupMode
+                          ? "Back to sign in"
+                          : "Set up first admin"}
+                      </Button>
+
+                    )}
 
 
                     <div className="flex items-center justify-center gap-2 pt-1 text-xs text-muted-foreground">

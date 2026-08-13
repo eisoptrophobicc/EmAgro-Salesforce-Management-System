@@ -50,31 +50,37 @@ const navigation = [
     title: "Employees",
     icon: UserRound,
     path: "/employees",
+    roles: ["Sub Admin"],
   },
   {
     title: "Attendance",
     icon: ClipboardCheck,
     path: "/attendance",
+    roles: ["Sub Admin"],
   },
   {
     title: "Tasks",
     icon: ListTodo,
     path: "/tasks",
+    roles: ["Sub Admin"],
   },
   {
     title: "Employee Tasks",
     icon: ClipboardList,
     path: "/employee-tasks",
+    roles: ["Sub Admin"],
   },
   {
     title: "Daily Activity",
     icon: ClipboardList,
     path: "/daily-activity",
+    roles: ["Sub Admin"],
   },
   {
     title: "Reports",
     icon: FileBarChart,
     path: "/reports",
+    roles: ["Sub Admin"],
   },
 ];
 
